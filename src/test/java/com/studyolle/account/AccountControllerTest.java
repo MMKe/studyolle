@@ -1,5 +1,6 @@
 package com.studyolle.account;
 
+import com.studyolle.domain.Account;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -62,19 +63,21 @@ class AccountControllerTest {
     @Test
     void signUpSubmit_with_correct_input() throws Exception {
         String email = "jongmin94@xenosolution.co.kr";
+        String password = "jongmin1994!";
         mockMvc
                 .perform(
                         post("/sign-up")
                                 .param("nickname", "jongmin94")
                                 .param("email", email)
-                                .param("password", "jongmin1994!")
+                                .param("password", password)
                                 .with(csrf())
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/"));
 
-        // 계정 저장 여부 확인
-        assertTrue(accountRepository.existsByEmail(email));
+        Account account = accountRepository.findByEmail(email);
+        assertNotNull(account);
+        assertNotEquals(account.getPassword(), password);
 
         // 메일 발송 여부 확인
         // 내가 관리하지 않는 코드(인터페이스로 사용하기만 함 -> 실제로 이메일을 발송하는 걸 테스트하긴 굉장히 어려움

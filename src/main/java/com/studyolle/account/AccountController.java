@@ -41,7 +41,6 @@ public class AccountController {
 
         accountService.processNewAccount(signUpForm);
 
-        // TODO 회원 가입 처리
         return "redirect:/";
     }
 }
