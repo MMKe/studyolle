@@ -4,12 +4,14 @@ import com.studyolle.domain.Account;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -19,6 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 class AccountControllerTest {
@@ -30,6 +33,38 @@ class AccountControllerTest {
 
     @MockBean
     JavaMailSender javaMailSender;
+
+    @DisplayName("인증 메일 확인 - 입력값 오류")
+    @Test
+    void checkEmailToken_with_wrong_input() throws Exception {
+        mockMvc.perform(get("/check-email-token")
+                        .param("token", "sdfjslwfwef")
+                        .param("email", "email@email.com")
+                )
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("error"))
+                .andExpect(view().name("account/checked-email"));
+    }
+
+    @DisplayName("인증 메일 확인 - 입력값 정상")
+    @Test
+    void checkEmailToken() throws Exception {
+        Account account = new Account("test@email.com", "12345678", "keesun");
+        Account savedAccount = accountRepository.save(account);
+        savedAccount.generateEmailCheckToken();
+
+        mockMvc.perform(get("/check-email-token")
+                        .param("token", savedAccount.getEmailCheckToken())
+                        .param("email", savedAccount.getEmail()))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeDoesNotExist("error"))
+                .andExpect(model().attributeExists("nickname"))
+                .andExpect(model().attributeExists("numberOfUser"))
+                .andExpect(view().name("account/checked-email"));
+
+        assertTrue(account.isEmailVerified());
+        assertNotNull(account.getJoinedAt());
+    }
 
     @DisplayName("회원가입 화면이 보이는지 테스트")
     @Test
