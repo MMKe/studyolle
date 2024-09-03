@@ -17,17 +17,20 @@ public class Account {
     @Column(unique = true)
     private String email;
 
+    @Getter
     @Column(unique = true)
     private String nickname;
 
     @Getter
     private String password;
 
+    @Setter
     private boolean emailVerified;
 
     @Getter
     private String emailCheckToken;
 
+    @Setter
     private LocalDateTime joinedAt;
 
     private String bio;

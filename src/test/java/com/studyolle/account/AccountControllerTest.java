@@ -78,6 +78,7 @@ class AccountControllerTest {
         Account account = accountRepository.findByEmail(email);
         assertNotNull(account);
         assertNotEquals(account.getPassword(), password);
+        assertNotNull(account.getEmailCheckToken());
 
         // 메일 발송 여부 확인
         // 내가 관리하지 않는 코드(인터페이스로 사용하기만 함 -> 실제로 이메일을 발송하는 걸 테스트하긴 굉장히 어려움
