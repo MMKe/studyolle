@@ -4,13 +4,17 @@ import com.studyolle.domain.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.validation.Valid;
 
 @Service
 @RequiredArgsConstructor
 public class AccountService {
     private final AccountRepository accountRepository;
     private final JavaMailSender javaMailSender;
+    private final PasswordEncoder passwordEncoder;
 
     public void processNewAccount(SignUpForm signUpForm) {
         Account savedAccount = saveNewAccount(signUpForm);
@@ -18,8 +22,14 @@ public class AccountService {
         sendSignUpConfirmEmail(savedAccount);
     }
 
-    private Account saveNewAccount(SignUpForm signUpForm) {
-        Account account = new Account(signUpForm.getEmail(), signUpForm.getNickname(), signUpForm.getNickname());
+    private Account saveNewAccount(@Valid SignUpForm signUpForm) {
+        String password = signUpForm.getPassword();
+        String encodedPassword = passwordEncoder.encode(password);
+        Account account = new Account(
+                signUpForm.getEmail(),
+                signUpForm.getNickname(),
+                encodedPassword
+        );
         return accountRepository.save(account);
     }
 

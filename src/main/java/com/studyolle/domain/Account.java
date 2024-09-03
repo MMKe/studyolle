@@ -20,6 +20,7 @@ public class Account {
     @Column(unique = true)
     private String nickname;
 
+    @Getter
     private String password;
 
     private boolean emailVerified;
