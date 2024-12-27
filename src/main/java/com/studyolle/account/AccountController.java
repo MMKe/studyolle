@@ -9,6 +9,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -64,5 +65,18 @@ public class AccountController {
         model.addAttribute("nickname", account.getNickname());
 
         return view;
+    }
+
+    @GetMapping("/check-email")
+    public String checkEmail(@CurrentUser Account account, Model model) {
+        return "account/check-email";
+    }
+
+    @ResponseBody
+    @PostMapping("/send-check-email")
+    public boolean sendCheckEmail(@CurrentUser Account account) {
+        accountService.sendSignUpConfirmEmail(account);
+
+        return true;
     }
 }
