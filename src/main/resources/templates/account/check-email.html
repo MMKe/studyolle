@@ -4,87 +4,28 @@
 <body class="bg-light">
 <div th:replace="fragments::main-nav"></div>
 
-<div class="py-5 text-center" th:if="${error}">
+<div class="container">
+  <div class="py-5 text-center" th:if="${error}">
     <p class="lead">스터디올래 이메일 확인</p>
-    <div class="alert alert-danger" role="alert">
-        이메일 확인 링크가 정확하지 않습니다.
+    <div class="alert alert-danger" role="alert" th:text="${error}">
+      이메일 확인 링크가 정확하지 않습니다.
     </div>
-</div>
+    <p class="lead" th:text="${email}">login user email</p>
+  </div>
 
-<div class="py-5 text-center" th:if="${error == null}">
+  <div class="py-5 text-center" th:if="${error == null}">
     <p class="lead">스터디올래 이메일 확인</p>
     <h2>
-        인증메일을 확인하여 인증 절차를 완료해주세요.
+      스터디올레 서비스를 사용하려면 인증 이메일을 확인하세요.
     </h2>
+
     <div>
-        <p class="text-info">인증메일을 다시 받고 싶으시다면 아래 버튼을 클릭해주세요</p>
+      <p class="lead" th:text="${email}">login user email</p>
+      <a th:href="@{/send-check-email}" class="btn btn-outline-info">인증 이메일 다시 보내기</a>
     </div>
-    <button type="button" class="btn btn-info btn-sm send-check-email">인증메일 재전송</button>
-    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+  </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">알림</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                인증 메일이 재전송되었습니다.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary">확인</button>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="fragments.html :: footer"></div>
-
-<script type="text/javascript">
-    async function callSendCheckEmailApi() {
-        const csrfToken = document.querySelector('input[name="_csrf"]').value
-
-        try {
-            // API 호출 (GET 예제)
-            const response = await fetch('/send-check-email', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken // CSRF 토큰 포함
-                },
-                body: JSON.stringify({})
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('API 응답:', data);
-            return data;
-        } catch (error) {
-            console.error('API 호출 에러:', error);
-            return null;
-        }
-    }
-
-    $(".send-check-email").click(async function () {
-        const result = await callSendCheckEmailApi();
-        if (result == null) {
-            return;
-        }
-
-        $('#exampleModal').modal('show')
-    })
-
-    $("#exampleModal .btn-primary").click(function () {
-        $('#exampleModal').modal('hide')
-    })
-</script>
 </body>
 </html>

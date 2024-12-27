@@ -69,14 +69,19 @@ public class AccountController {
 
     @GetMapping("/check-email")
     public String checkEmail(@CurrentUser Account account, Model model) {
+        model.addAttribute("email", account.getEmail());
         return "account/check-email";
     }
 
-    @ResponseBody
-    @PostMapping("/send-check-email")
-    public boolean sendCheckEmail(@CurrentUser Account account) {
+    @GetMapping("/send-check-email")
+    public String sendCheckEmail(@CurrentUser Account account, Model model) {
+        if (!account.canSendConfirmMail()) {
+            model.addAttribute("error", "인증 이메일은 1시간에 한번만 전송할 수 있습니다.");
+            model.addAttribute("email", account.getEmail());
+            return "account/check-email";
+        }
         accountService.sendSignUpConfirmEmail(account);
 
-        return true;
+        return "redirect:/";
     }
 }
