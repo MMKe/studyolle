@@ -35,14 +35,19 @@ public class Account {
     @Getter
     private LocalDateTime joinedAt;
 
+    @Getter
     private String bio;
 
+    @Getter
     private String url;
 
+    @Getter
     private String occupation;
 
+    @Getter
     private String location; // varchar(255)
 
+    @Getter
     @Lob @Basic(fetch = FetchType.EAGER)
     private String profileImage;
 
