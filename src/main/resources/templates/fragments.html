@@ -82,6 +82,16 @@
   </div>
 </footer>
 
+<div th:fragment="settings-menu (currentMenu)" class="list-group">
+  <div class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'profile'} ? active : ''" href="#" th:href="@{/settings/profile}">프로필</div>
+  <div class="list-group-item list-group-item-action" href="#">패스워드</div>
+  <div class="list-group-item list-group-item-action" href="#">알림</div>
+  <div class="list-group-item list-group-item-action" href="#">관심 주제</div>
+  <div class="list-group-item list-group-item-action" href="#">활동 지역</div>
+  <div class="list-group-item list-group-item-action list-group-item-danger" href="#">계정</div>
+</div>
+
+
 <script type="application/javascript" th:fragment="form-validation">
   (function () {
     'use strict';
