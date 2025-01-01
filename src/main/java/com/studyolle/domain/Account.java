@@ -1,5 +1,6 @@
 package com.studyolle.domain;
 
+import com.studyolle.settings.Profile;
 import lombok.*;
 
 import javax.persistence.*;
@@ -91,5 +92,12 @@ public class Account {
 
     public boolean canSendConfirmMail() {
         return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
+    }
+
+    public void updateProfile(Profile profile) {
+        this.bio = profile.getBio();
+        this.url = profile.getUrl();
+        this.occupation = profile.getOccupation();
+        this.location = profile.getLocation();
     }
 }
