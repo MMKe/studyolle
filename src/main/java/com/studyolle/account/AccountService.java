@@ -1,6 +1,7 @@
 package com.studyolle.account;
 
 import com.studyolle.domain.Account;
+import com.studyolle.settings.PasswordUpdateForm;
 import com.studyolle.settings.Profile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -86,6 +87,13 @@ public class AccountService implements UserDetailsService {
 
     public void updateProfile(Account account, Profile profile) {
         account.updateProfile(profile);
+        accountRepository.save(account);
+    }
+
+    public void updatePassword(Account account, PasswordUpdateForm passwordUpdateForm) {
+        String newPassword = passwordUpdateForm.getNewPassword();
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        account.updatePassword(encodedPassword);
         accountRepository.save(account);
     }
 }

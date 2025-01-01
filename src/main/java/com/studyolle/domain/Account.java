@@ -1,5 +1,6 @@
 package com.studyolle.domain;
 
+import com.studyolle.settings.PasswordUpdateForm;
 import com.studyolle.settings.Profile;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -102,5 +103,9 @@ public class Account {
         this.occupation = profile.getOccupation();
         this.location = profile.getLocation();
         this.profileImage = profile.getProfileImage();
+    }
+
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
     }
 }
