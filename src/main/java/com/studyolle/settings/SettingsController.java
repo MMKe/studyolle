@@ -3,6 +3,7 @@ package com.studyolle.settings;
 import com.studyolle.account.AccountService;
 import com.studyolle.account.CurrentUser;
 import com.studyolle.domain.Account;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -14,17 +15,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
 
 @Controller
+@RequiredArgsConstructor
 public class SettingsController {
-    private static final String SETTINGS_PROFILE_VIEW_NAME = "settings/profile";
-    private static final String SETTINGS_PROFILE_URL ="/settings/profile";
+    public static final String SETTINGS_PROFILE_VIEW_NAME = "settings/profile";
+    public static final String SETTINGS_PROFILE_URL ="/settings/profile";
 
     private final AccountService accountService;
 
-    public SettingsController(AccountService accountService) {
-        this.accountService = accountService;
-    }
-
-    @GetMapping("/settings/profile")
+    @GetMapping(SETTINGS_PROFILE_URL)
     public String profileUpdateForm(@CurrentUser Account account, Model model) {
         model.addAttribute(account);
         model.addAttribute(new Profile(account));
@@ -32,7 +30,7 @@ public class SettingsController {
         return SETTINGS_PROFILE_VIEW_NAME;
     }
 
-    @PostMapping("/settings/profile")
+    @PostMapping(SETTINGS_PROFILE_URL)
     public String updateProfile(
             @CurrentUser Account account,
             @Valid @ModelAttribute Profile profile,
