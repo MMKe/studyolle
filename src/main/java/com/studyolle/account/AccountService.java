@@ -86,7 +86,6 @@ public class AccountService implements UserDetailsService {
 
     public void updateProfile(Account account, Profile profile) {
         account.updateProfile(profile);
-        // TODO 프로필 이미지 변경
         accountRepository.save(account);
     }
 }

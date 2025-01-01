@@ -1,7 +1,8 @@
 package com.studyolle.domain;
 
 import com.studyolle.settings.Profile;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -49,7 +50,8 @@ public class Account {
     private String location; // varchar(255)
 
     @Getter
-    @Lob @Basic(fetch = FetchType.EAGER)
+    @Lob
+    @Basic(fetch = FetchType.EAGER)
     private String profileImage;
 
     private boolean studyCreatedByEmail;
@@ -99,5 +101,6 @@ public class Account {
         this.url = profile.getUrl();
         this.occupation = profile.getOccupation();
         this.location = profile.getLocation();
+        this.profileImage = profile.getProfileImage();
     }
 }
