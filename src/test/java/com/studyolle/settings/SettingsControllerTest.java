@@ -9,12 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static com.studyolle.settings.SettingsController.SETTINGS_PROFILE_URL;
-import static com.studyolle.settings.SettingsController.SETTINGS_PROFILE_VIEW_NAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static com.studyolle.settings.SettingsController.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,6 +27,8 @@ class SettingsControllerTest {
 
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @AfterEach
     public void afterEach() {
@@ -78,4 +79,56 @@ class SettingsControllerTest {
         assertNull(account.getBio());
     }
 
+    @WithAccount("jongmin94")
+    @DisplayName("패스워드 수정하기 폼")
+    @Test
+    void updatePasswordForm() throws Exception {
+        mockMvc.perform(get(SETTINGS_PASSWORD_URL))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("account"))
+                .andExpect(model().attributeExists("passwordUpdateForm"))
+                .andExpect(view().name(SETTINGS_PASSWORD_VIEW_NAME));
+    }
+
+    @DisplayName("패스워드 수정하기 폼 - 비인증 사용자")
+    @Test
+    void updatePasswordForm_unauthenticated() throws Exception {
+        mockMvc.perform(get(SETTINGS_PASSWORD_URL))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+    }
+
+    @WithAccount("jongmin94")
+    @DisplayName("패스워드 수정하기")
+    @Test
+    void updatePassword() throws Exception {
+        String newPassword = "newPassword";
+        mockMvc.perform(post(SETTINGS_PASSWORD_URL)
+                        .param("newPassword", newPassword)
+                        .param("newPasswordConfirm", newPassword)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("message"))
+                .andExpect(redirectedUrl(SETTINGS_PASSWORD_URL));
+
+        Account account = accountRepository.findByNickname("jongmin94");
+        boolean matches = passwordEncoder.matches(newPassword, account.getPassword());
+        assertTrue(matches);
+    }
+
+    @WithAccount("jongmin94")
+    @DisplayName("패스워드 수정하기 - 패스워드 불일치")
+    @Test
+    void updatePassword_fail() throws Exception {
+        String newPassword = "newPassword";
+        mockMvc.perform(post(SETTINGS_PASSWORD_URL)
+                        .param("newPassword", newPassword)
+                        .param("newPasswordConfirm", newPassword + "_")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(model().hasErrors())
+                .andExpect(view().name(SETTINGS_PASSWORD_VIEW_NAME))
+                .andExpect(model().attributeExists("account"))
+                .andExpect(model().attributeExists("passwordUpdateForm"));
+    }
 }
