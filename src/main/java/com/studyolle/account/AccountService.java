@@ -1,6 +1,7 @@
 package com.studyolle.account;
 
 import com.studyolle.domain.Account;
+import com.studyolle.settings.Notifications;
 import com.studyolle.settings.PasswordUpdateForm;
 import com.studyolle.settings.Profile;
 import lombok.RequiredArgsConstructor;
@@ -94,6 +95,11 @@ public class AccountService implements UserDetailsService {
         String newPassword = passwordUpdateForm.getNewPassword();
         String encodedPassword = passwordEncoder.encode(newPassword);
         account.updatePassword(encodedPassword);
+        accountRepository.save(account);
+    }
+
+    public void updateNotification(Account account, Notifications notifications) {
+        account.updateNotification(notifications);
         accountRepository.save(account);
     }
 }

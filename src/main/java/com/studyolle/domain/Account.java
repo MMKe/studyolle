@@ -1,6 +1,6 @@
 package com.studyolle.domain;
 
-import com.studyolle.settings.PasswordUpdateForm;
+import com.studyolle.settings.Notifications;
 import com.studyolle.settings.Profile;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -55,17 +55,23 @@ public class Account {
     @Basic(fetch = FetchType.EAGER)
     private String profileImage;
 
+    @Getter
     private boolean studyCreatedByEmail;
 
-    private boolean studyCreatedByWeb;
+    @Getter
+    private boolean studyCreatedByWeb = true;
 
+    @Getter
     private boolean studyEnrolmentResultByEmail;
 
-    private boolean studyEnrolmentResultByWeb;
+    @Getter
+    private boolean studyEnrolmentResultByWeb = true;
 
+    @Getter
     private boolean studyUpdatedByEmail;
 
-    private boolean studyUpdatedByWeb;
+    @Getter
+    private boolean studyUpdatedByWeb = true;
 
     public Account() {
     }
@@ -107,5 +113,14 @@ public class Account {
 
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public void updateNotification(Notifications notifications) {
+        this.studyCreatedByEmail = notifications.isStudyCreatedByEmail();
+        this.studyCreatedByWeb = notifications.isStudyCreatedByWeb();
+        this.studyEnrolmentResultByEmail = notifications.isStudyEnrolmentResultByEmail();
+        this.studyEnrolmentResultByWeb = notifications.isStudyEnrolmentResultByWeb();
+        this.studyUpdatedByEmail = notifications.isStudyUpdatedByEmail();
+        this.studyUpdatedByWeb = notifications.isStudyUpdatedByWeb();
     }
 }
