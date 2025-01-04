@@ -5,6 +5,7 @@ import com.studyolle.settings.Notifications;
 import com.studyolle.settings.PasswordUpdateForm;
 import com.studyolle.settings.Profile;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +28,7 @@ public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     public Account processNewAccount(SignUpForm signUpForm) {
         Account savedAccount = saveNewAccount(signUpForm);
@@ -87,7 +89,7 @@ public class AccountService implements UserDetailsService {
     }
 
     public void updateProfile(Account account, Profile profile) {
-        account.updateProfile(profile);
+        modelMapper.map(profile, account);
         accountRepository.save(account);
     }
 
@@ -99,7 +101,7 @@ public class AccountService implements UserDetailsService {
     }
 
     public void updateNotification(Account account, Notifications notifications) {
-        account.updateNotification(notifications);
+        modelMapper.map(notifications, account);
         accountRepository.save(account);
     }
 }

@@ -1,14 +1,15 @@
 package com.studyolle.domain;
 
-import com.studyolle.settings.Notifications;
-import com.studyolle.settings.Profile;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Getter
+@Setter
 @Entity
 @EqualsAndHashCode(of = "id") // 연관관계가 복잡해질때, 무한루프가 발생할 수 있으므로 id만 사용하여 동일성/동등성 비교하도록 한다.
 public class Account {
@@ -103,24 +104,7 @@ public class Account {
         return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
     }
 
-    public void updateProfile(Profile profile) {
-        this.bio = profile.getBio();
-        this.url = profile.getUrl();
-        this.occupation = profile.getOccupation();
-        this.location = profile.getLocation();
-        this.profileImage = profile.getProfileImage();
-    }
-
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
-    }
-
-    public void updateNotification(Notifications notifications) {
-        this.studyCreatedByEmail = notifications.isStudyCreatedByEmail();
-        this.studyCreatedByWeb = notifications.isStudyCreatedByWeb();
-        this.studyEnrolmentResultByEmail = notifications.isStudyEnrolmentResultByEmail();
-        this.studyEnrolmentResultByWeb = notifications.isStudyEnrolmentResultByWeb();
-        this.studyUpdatedByEmail = notifications.isStudyUpdatedByEmail();
-        this.studyUpdatedByWeb = notifications.isStudyUpdatedByWeb();
     }
 }
