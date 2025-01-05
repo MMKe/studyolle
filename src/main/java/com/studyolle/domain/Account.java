@@ -17,61 +17,44 @@ public class Account {
     @GeneratedValue
     private Long id;
 
-    @Getter
     @Column(unique = true)
     private String email;
 
-    @Getter
     @Column(unique = true)
     private String nickname;
 
-    @Getter
     private String password;
 
-    @Getter
     private boolean emailVerified;
 
-    @Getter
     private String emailCheckToken;
 
     private LocalDateTime emailCheckTokenGeneratedAt;
 
-    @Getter
     private LocalDateTime joinedAt;
 
-    @Getter
     private String bio;
 
-    @Getter
     private String url;
 
-    @Getter
     private String occupation;
 
-    @Getter
     private String location; // varchar(255)
 
-    @Getter
     @Lob
     @Basic(fetch = FetchType.EAGER)
     private String profileImage;
 
-    @Getter
     private boolean studyCreatedByEmail;
 
-    @Getter
     private boolean studyCreatedByWeb = true;
 
-    @Getter
     private boolean studyEnrolmentResultByEmail;
 
-    @Getter
     private boolean studyEnrolmentResultByWeb = true;
 
-    @Getter
     private boolean studyUpdatedByEmail;
 
-    @Getter
     private boolean studyUpdatedByWeb = true;
 
     public Account() {
