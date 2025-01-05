@@ -2,6 +2,7 @@ package com.studyolle.account;
 
 import com.studyolle.domain.Account;
 import com.studyolle.domain.Tag;
+import com.studyolle.domain.Zone;
 import com.studyolle.settings.Notifications;
 import com.studyolle.settings.PasswordUpdateForm;
 import com.studyolle.settings.Profile;
@@ -124,6 +125,7 @@ public class AccountService implements UserDetailsService {
         byId.ifPresent(a -> a.getTags().add(tag));
     }
 
+    @Transactional(readOnly = true)
     public Set<Tag> getTags(Account account) {
         Optional<Account> byId = accountRepository.findById(account.getId());
         return byId.get().getTags();
@@ -132,5 +134,21 @@ public class AccountService implements UserDetailsService {
     public void removeTag(Account account, Tag tag) {
         accountRepository.findById(account.getId())
                 .ifPresent(a -> a.getTags().remove(tag));
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Zone> getZones(Account account) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        return byId.get().getZones();
+    }
+
+    public void addZone(Account account, Zone zone) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        byId.ifPresent(a -> a.getZones().add(zone));
+    }
+
+    public void removeZone(Account account, Zone zone) {
+        accountRepository.findById(account.getId())
+                .ifPresent(a -> a.getZones().remove(zone));
     }
 }
