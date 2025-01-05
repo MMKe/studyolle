@@ -1,5 +1,7 @@
 package com.studyolle.settings;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.studyolle.account.AccountService;
 import com.studyolle.account.CurrentUser;
 import com.studyolle.domain.Account;
@@ -39,6 +41,7 @@ public class SettingsController {
     private final NicknameValidator nicknameValidator;
     private final ModelMapper modelMapper;
     private final TagRepository tagRepository;
+    private final ObjectMapper objectMapper;
 
     @InitBinder(value = "passwordUpdateForm")
     public void initPasswordUpdateFormBinder(WebDataBinder binder) {
@@ -154,13 +157,20 @@ public class SettingsController {
     }
 
     @GetMapping(SETTINGS_TAGS_URL)
-    public String updateTags(@CurrentUser Account account, Model model) {
+    public String updateTags(@CurrentUser Account account, Model model) throws JsonProcessingException {
         model.addAttribute(account);
+
         List<String> tags = accountService.getTags(account)
                 .stream()
                 .map(Tag::getTitle)
                 .collect(Collectors.toList());
         model.addAttribute("tags", tags);
+
+        List<String> allTags = tagRepository.findAll()
+                .stream()
+                .map(Tag::getTitle)
+                .collect(Collectors.toList());
+        model.addAttribute("whitelist", objectMapper.writeValueAsString(allTags));
 
         return SETTINGS_TAGS_VIEW_NAME;
     }
