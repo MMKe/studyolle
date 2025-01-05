@@ -1,16 +1,24 @@
 package com.studyolle.settings;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.studyolle.WithAccount;
 import com.studyolle.account.AccountRepository;
+import com.studyolle.account.AccountService;
 import com.studyolle.domain.Account;
+import com.studyolle.domain.Tag;
+import com.studyolle.tag.TagRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static com.studyolle.settings.SettingsController.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 class SettingsControllerTest {
@@ -29,6 +38,12 @@ class SettingsControllerTest {
     private AccountRepository accountRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private TagRepository tagRepository;
+    @Autowired
+    private AccountService accountService;
 
     @AfterEach
     public void afterEach() {
@@ -130,5 +145,60 @@ class SettingsControllerTest {
                 .andExpect(view().name(SETTINGS_PASSWORD_VIEW_NAME))
                 .andExpect(model().attributeExists("account"))
                 .andExpect(model().attributeExists("passwordUpdateForm"));
+    }
+
+    @WithAccount("jongmin94")
+    @DisplayName("태그 폼")
+    @Test
+    void updateTagForm() throws Exception {
+        mockMvc.perform(get(SETTINGS_TAGS_URL))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("account"))
+                .andExpect(model().attributeExists("tags"))
+                .andExpect(model().attributeExists("whitelist"))
+                .andExpect(view().name(SETTINGS_TAGS_VIEW_NAME));
+
+    }
+
+    @WithAccount("jongmin94")
+    @DisplayName("태그 추가하기")
+    @Test
+    void addTag() throws Exception {
+        TagForm tagForm = new TagForm();
+        tagForm.setTagTitle("newTag");
+
+        mockMvc.perform(post("/settings/tags/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tagForm))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        Optional<Tag> optionalTag = tagRepository.findByTitle(tagForm.getTagTitle());
+        assertTrue(optionalTag.isPresent());
+        assertTrue(accountRepository.findByNickname("jongmin94").getTags().contains(optionalTag.get()));
+    }
+
+    @WithAccount("jongmin94")
+    @DisplayName("태그 삭제하기")
+    @Test
+    void removeTag() throws Exception {
+        Tag tag = new Tag();
+        tag.setTitle("newTag");
+        Tag savedTag = tagRepository.save(tag);
+        Account account = accountRepository.findByNickname("jongmin94");
+        accountService.addTag(account, savedTag);
+
+        assertTrue(account.getTags().contains(savedTag));
+
+        TagForm tagForm = new TagForm();
+        tagForm.setTagTitle("newTag");
+
+        mockMvc.perform(post("/settings/tags/remove")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tagForm))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        assertFalse(account.getTags().contains(savedTag));
     }
 }
