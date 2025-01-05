@@ -15,12 +15,13 @@
       </div>
       <div class="row">
         <div class="col-12">
-        <div class="alert alert-info" role="alert">
-          <p>참여하고 싶은 스터디 주제를 입력해 주세요.</p>
-          <p>해당 주제의 스터디가 생기면 알림을 받을 수 있습니다.</p>
-          <p>태그를 입력하고 콤마(,) 또는 엔터를 입력하세요.</p>
-        </div>
-        <input id="tags" type="text" name="tags" class="tagify--outside" aria-describedby="tagHelp" th:value="${#strings.listJoin(tags, ',')}"/>
+          <div class="alert alert-info" role="alert">
+            <p>참여하고 싶은 스터디 주제를 입력해 주세요.</p>
+            <p>해당 주제의 스터디가 생기면 알림을 받을 수 있습니다.</p>
+            <p>태그를 입력하고 콤마(,) 또는 엔터를 입력하세요.</p>
+          </div>
+          <input id="tags" type="text" name="tags" class="tagify--outside" aria-describedby="tagHelp"
+                 th:value="${#strings.listJoin(tags, ',')}"/>
         </div>
       </div>
     </div>
@@ -29,7 +30,7 @@
 <script type="text/javascript" src="/node_modules/@yaireo/tagify/dist/tagify.js"></script>
 
 <script type="text/javascript" th:inline="javascript">
-  $(function() {
+  $(function () {
     const csrfToken = /*[[${_csrf.token}]]*/ null;
     const csrfHeader = /*[[${_csrf.headerName}]]*/ null;
     $(document).ajaxSend(function (e, xhr, options) {
@@ -39,7 +40,7 @@
 </script>
 
 <script type="text/javascript">
-  $(function() {
+  $(function () {
     function tagResult(url, tagTitle) {
       $.ajax({
         dataType: "json",

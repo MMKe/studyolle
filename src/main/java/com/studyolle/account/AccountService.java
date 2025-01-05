@@ -133,4 +133,9 @@ public class AccountService implements UserDetailsService {
         Optional<Account> byId = accountRepository.findById(account.getId());
         return byId.get().getTags();
     }
+
+    public void removeTag(Account account, Tag tag) {
+        accountRepository.findById(account.getId())
+                .ifPresent(a -> a.getTags().remove(tag));
+    }
 }

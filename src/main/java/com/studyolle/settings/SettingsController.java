@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -176,6 +177,20 @@ public class SettingsController {
                 });
 
         accountService.addTag(account, tag);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @ResponseBody
+    @PostMapping("/settings/tags/remove")
+    public ResponseEntity removeTags(@CurrentUser Account account, @RequestBody TagForm tagForm) {
+        String title = tagForm.getTagTitle();
+        Optional<Tag> optionalTag = tagRepository.findByTitle(title);
+        if (optionalTag.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        accountService.removeTag(account, optionalTag.get());
 
         return ResponseEntity.ok().build();
     }
