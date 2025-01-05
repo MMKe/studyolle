@@ -68,9 +68,6 @@ public class Account {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
-        this.studyCreatedByWeb = true;
-        this.studyEnrolmentResultByWeb = true;
-        this.studyUpdatedByWeb = true;
     }
 
     public void generateEmailCheckToken() {
