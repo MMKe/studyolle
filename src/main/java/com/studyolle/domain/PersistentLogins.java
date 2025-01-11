@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
-@Table(name = "persistent_logins")
+@Table(name = "persistent_logins", schema = "testuser")
 @Entity
 @Getter @Setter
 public class PersistentLogins {

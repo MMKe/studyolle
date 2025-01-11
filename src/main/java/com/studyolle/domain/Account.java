@@ -13,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@Table(schema = "testuser")
 @EqualsAndHashCode(of = "id") // 연관관계가 복잡해질때, 무한루프가 발생할 수 있으므로 id만 사용하여 동일성/동등성 비교하도록 한다.
 public class Account {
     @Id
