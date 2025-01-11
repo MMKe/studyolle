@@ -1,14 +1,14 @@
 package com.studyolle.account;
 
 import com.studyolle.domain.Account;
+import com.studyolle.mail.EmailMessage;
+import com.studyolle.mail.EmailService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +33,7 @@ class AccountControllerTest {
     AccountRepository accountRepository;
 
     @MockBean
-    JavaMailSender javaMailSender;
+    EmailService emailService;
 
     @DisplayName("인증 메일 확인 - 입력값 오류")
     @Test
@@ -122,9 +122,6 @@ class AccountControllerTest {
         assertNotEquals(account.getPassword(), password);
         assertNotNull(account.getEmailCheckToken());
 
-        // 메일 발송 여부 확인
-        // 내가 관리하지 않는 코드(인터페이스로 사용하기만 함 -> 실제로 이메일을 발송하는 걸 테스트하긴 굉장히 어려움
-        // 테스트코드가 너무 디테일해도 어렵다
-        then(javaMailSender).should().send(any(SimpleMailMessage.class));
+        then(emailService).should().send(any(EmailMessage.class));
     }
 }

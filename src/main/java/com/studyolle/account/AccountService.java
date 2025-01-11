@@ -3,13 +3,14 @@ package com.studyolle.account;
 import com.studyolle.domain.Account;
 import com.studyolle.domain.Tag;
 import com.studyolle.domain.Zone;
+import com.studyolle.mail.EmailMessage;
+import com.studyolle.mail.EmailService;
 import com.studyolle.settings.Notifications;
 import com.studyolle.settings.PasswordUpdateForm;
 import com.studyolle.settings.Profile;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,12 +26,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
-    private final JavaMailSender javaMailSender;
+    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
@@ -49,11 +51,13 @@ public class AccountService implements UserDetailsService {
     }
 
     public void sendSignUpConfirmEmail(Account savedAccount) {
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setTo(savedAccount.getEmail());
-        simpleMailMessage.setSubject("스터디올래 회원가입 인증");
-        simpleMailMessage.setText("/check-email-token?token=" + savedAccount.getEmailCheckToken() + "&email=" + savedAccount.getEmail());
-        javaMailSender.send(simpleMailMessage);
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(savedAccount.getEmail())
+                .subject("스터디올래 회원가입 인증")
+                .message("/check-email-token?token=" + savedAccount.getEmailCheckToken() + "&email=" + savedAccount.getEmail())
+                .build();
+
+        emailService.send(emailMessage);
     }
 
     public void login(Account account) {
@@ -113,11 +117,12 @@ public class AccountService implements UserDetailsService {
     public void sendLoginLink(Account savedAccount) {
         savedAccount.generateEmailCheckToken();
 
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setTo(savedAccount.getEmail());
-        simpleMailMessage.setSubject("스터디올래 이메일 로그인 링크");
-        simpleMailMessage.setText("/login-by-email?token=" + savedAccount.getEmailCheckToken() + "&email=" + savedAccount.getEmail());
-        javaMailSender.send(simpleMailMessage);
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(savedAccount.getEmail())
+                .subject("스터디올래 이메일 로그인 링크")
+                .message("/login-by-email?token=" + savedAccount.getEmailCheckToken() + "&email=" + savedAccount.getEmail())
+                .build();
+        emailService.send(emailMessage);
     }
 
     public void addTag(Account account, Tag tag) {
