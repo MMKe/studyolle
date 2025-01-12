@@ -1,0 +1,19 @@
+package com.studyolle.study;
+
+import com.studyolle.domain.Account;
+import com.studyolle.domain.Study;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class StudyService {
+    private final StudyRepository studyRepository;
+
+    public Study createNewStudy(Study study, Account account) {
+        study.addManager(account);
+        return studyRepository.save(study);
+    }
+}
