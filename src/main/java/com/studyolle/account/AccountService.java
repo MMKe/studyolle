@@ -1,5 +1,6 @@
 package com.studyolle.account;
 
+import com.studyolle.config.AppProperties;
 import com.studyolle.domain.Account;
 import com.studyolle.domain.Tag;
 import com.studyolle.domain.Zone;
@@ -10,6 +11,7 @@ import com.studyolle.settings.PasswordUpdateForm;
 import com.studyolle.settings.Profile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +22,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.context.IContext;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -35,6 +40,8 @@ public class AccountService implements UserDetailsService {
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+    private final TemplateEngine templateEngine;
+    private final AppProperties appProperties;
 
     public Account processNewAccount(SignUpForm signUpForm) {
         Account savedAccount = saveNewAccount(signUpForm);
@@ -51,10 +58,18 @@ public class AccountService implements UserDetailsService {
     }
 
     public void sendSignUpConfirmEmail(Account savedAccount) {
+        Context context = new Context();
+        context.setVariable("link", "/check-email-token?token=" + savedAccount.getEmailCheckToken() + "&email=" + savedAccount.getEmail());
+        context.setVariable("nickname", savedAccount.getNickname());
+        context.setVariable("linkName", "이메일 인증하기");
+        context.setVariable("message", "스터디올레 서비스를 사용하기 위해서 링크를 통해 이메일 인증을 완료해주세요.");
+        context.setVariable("host", appProperties.getHost());
+        String message = templateEngine.process("email/email-link", context);
+
         EmailMessage emailMessage = EmailMessage.builder()
                 .to(savedAccount.getEmail())
                 .subject("스터디올래 회원가입 인증")
-                .message("/check-email-token?token=" + savedAccount.getEmailCheckToken() + "&email=" + savedAccount.getEmail())
+                .message(message)
                 .build();
 
         emailService.send(emailMessage);
@@ -117,10 +132,18 @@ public class AccountService implements UserDetailsService {
     public void sendLoginLink(Account savedAccount) {
         savedAccount.generateEmailCheckToken();
 
+        Context context = new Context();
+        context.setVariable("link", "/login-by-email?token=" + savedAccount.getEmailCheckToken() + "&email=" + savedAccount.getEmail());
+        context.setVariable("nickname", savedAccount.getNickname());
+        context.setVariable("linkName", "스터디올레 로그인");
+        context.setVariable("message", "로그인을 위해 아래 링크를 클릭하세요.");
+        context.setVariable("host", appProperties.getHost());
+        String message = templateEngine.process("email/email-link", context);
+
         EmailMessage emailMessage = EmailMessage.builder()
                 .to(savedAccount.getEmail())
                 .subject("스터디올래 이메일 로그인 링크")
-                .message("/login-by-email?token=" + savedAccount.getEmailCheckToken() + "&email=" + savedAccount.getEmail())
+                .message(message)
                 .build();
         emailService.send(emailMessage);
     }
